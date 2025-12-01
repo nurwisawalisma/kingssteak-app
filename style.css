@@ -1,0 +1,325 @@
+/* Base Styles */
+body {
+    box-sizing: border-box;
+}
+
+/* View Transition */
+@view-transition {
+    navigation: auto;
+}
+
+/* Login Screen Styles */
+.login-screen {
+    background: linear-gradient(to bottom right, #f1f5f9, #e2e8f0);
+}
+
+/* Main App Styles */
+.main-app {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Header Gradient */
+.header-gradient {
+    background: linear-gradient(to right, #475569, #475569);
+}
+
+/* Sidebar Navigation */
+.sidebar {
+    width: 16rem;
+    background-color: white;
+    border-right: 1px solid #e5e7eb;
+    overflow-y: auto;
+}
+
+/* Active Tab Styles */
+.tab-active {
+    background-color: #475569;
+    color: white;
+}
+
+.tab-inactive {
+    background-color: #f3f4f6;
+    color: #374151;
+}
+
+.tab-inactive:hover {
+    background-color: #e5e7eb;
+}
+
+/* Submenu Styles */
+.submenu-active {
+    background-color: #475569;
+    color: white;
+}
+
+.submenu-inactive {
+    background-color: #f9fafb;
+    color: #6b7280;
+}
+
+.submenu-inactive:hover {
+    background-color: #f3f4f6;
+}
+
+/* Dashboard Styles */
+.dashboard-content {
+    flex: 1;
+    overflow-y: auto;
+}
+
+/* Toast Notification Base */
+.toast {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    color: white;
+    z-index: 50;
+}
+
+.toast-success {
+    background-color: #16a34a;
+}
+
+.toast-error {
+    background-color: #dc2626;
+}
+
+/* Chart Containers */
+.chart-container {
+    background-color: white;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    border: 1px solid #e5e7eb;
+}
+
+/* Confirmation Modal */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 50;
+}
+
+.modal-content {
+    background-color: white;
+    padding: 1.5rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    max-width: 28rem;
+}
+
+/* Button Disabled State */
+button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .sidebar {
+        width: 100%;
+        max-width: 16rem;
+    }
+
+    .main-app {
+        flex-direction: column;
+    }
+}
+
+/* Print Styles */
+@media print {
+    .no-print {
+        display: none !important;
+    }
+
+    body {
+        background: white;
+    }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f5f9;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+/* Animation for transitions */
+.fade-in {
+    animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Table Styles */
+table {
+    border-collapse: collapse;
+}
+
+table th {
+    position: sticky;
+    top: 0;
+    background-color: #f9fafb;
+    z-index: 10;
+}
+
+/* Form Input Focus */
+input:focus,
+select:focus,
+textarea:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px #475569;
+    border-color: transparent;
+}
+
+/* Card Styles */
+.card {
+    background-color: white;
+    border-radius: 0.5rem;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+}
+
+.card-hover:hover {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+    transition: all 0.2s ease-in-out;
+}
+
+/* Badge Styles */
+.badge {
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+    border-radius: 9999px;
+}
+
+.badge-success {
+    background-color: #dcfce7;
+    color: #15803d;
+}
+
+.badge-error {
+    background-color: #fee2e2;
+    color: #b91c1c;
+}
+
+.badge-info {
+    background-color: #dbeafe;
+    color: #1e40af;
+}
+
+/* Loading Spinner */
+.spinner {
+    border: 2px solid #f3f4f6;
+    border-top: 2px solid #475569;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* ========== PDF STYLES ========== */
+
+/* Print Styles untuk PDF */
+@media print {
+    body {
+        margin: 0;
+        padding: 20px;
+        background: white;
+    }
+    
+    .no-print,
+    button,
+    header,
+    nav,
+    .btn-arsip-riwayat,
+    .btn-reset-riwayat,
+    .btn-download-riwayat,
+    [class*="btn-arsip"],
+    [class*="btn-reset"],
+    [class*="btn-download"] {
+        display: none !important;
+    }
+    
+    table {
+        page-break-inside: auto;
+    }
+    
+    tr {
+        page-break-inside: avoid;
+        page-break-after: auto;
+    }
+    
+    thead {
+        display: table-header-group;
+    }
+    
+    tfoot {
+        display: table-footer-group;
+    }
+}
+
+/* Style khusus untuk PDF Container */
+.pdf-container {
+    background: white;
+    padding: 20px;
+}
+
+.pdf-header {
+    text-align: center;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #e2e8f0;
+    padding-bottom: 15px;
+}
+
+.pdf-header h1 {
+    color: #1e293b;
+    font-size: 24px;
+    margin-bottom: 5px;
+}
+
+.pdf-header h2 {
+    color: #475569;
+    font-size: 18px;
+    margin-bottom: 5px;
+}
+
+.pdf-header p {
+    color: #64748b;
+    font-size: 12px;
+    margin: 3px 0;
+}
