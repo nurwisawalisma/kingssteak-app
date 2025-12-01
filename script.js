@@ -298,22 +298,8 @@ function updateDateTime() {
     const now = new Date();
     const elTanggal = document.getElementById('tanggal');
     const elWaktu = document.getElementById('waktu');
-    
-    if (elTanggal) {
-        // Format: 30/11/2025
-        const day = String(now.getDate()).padStart(2, '0');
-        const month = String(now.getMonth() + 1).padStart(2, '0');
-        const year = now.getFullYear();
-        elTanggal.textContent = `${day}/${month}/${year}`;
-    }
-    
-    if (elWaktu) {
-        // Format: 22.55.08
-        const hours = String(now.getHours()).padStart(2, '0');
-        const minutes = String(now.getMinutes()).padStart(2, '0');
-        const seconds = String(now.getSeconds()).padStart(2, '0');
-        elWaktu.textContent = `${hours}.${minutes}.${seconds}`;
-    }
+    if (elTanggal) elTanggal.textContent = now.toLocaleDateString('id-ID');
+    if (elWaktu) elWaktu.textContent = now.toLocaleTimeString('id-ID');
 }
 
 function isEndOfMonth() {
@@ -597,8 +583,6 @@ async function simpanData() {
             btnSimpan.disabled = false;
             btnSimpan.textContent = 'Simpan Data';
         }
-        // Simpan periode juga
-localStorage.setItem('currentPeriod', JSON.stringify(currentPeriod));
     } catch (e) {
         console.error(e);
         showToast('Terjadi kesalahan saat menyimpan', 'error');
@@ -2037,240 +2021,13 @@ function renderDiagram() {
         }
     }, 300); // Delay 300ms untuk memastikan Chart.js ready
 }
+function arsipkanHalaman(name){ showToast(name+' - arsip belum tersedia di mode terpisah','error'); }
 async function flushSync(){return}
-// State untuk arsip - TAMBAHKAN setelah deklarasi transaksiList
-let arsipData = {
-    'Riwayat Transaksi': [],
-    'Diagram Keuangan': [],
-    'Jurnal Umum': [],
-    'Buku Besar': [],
-    'Neraca Saldo': [],
-    'Laporan Keuangan': [],
-    'Laporan Kas': [],
-    'Laporan Modal': []
-};
+async function resetData(){ showToast('Reset data tidak diimplementasikan di mode terpisah','error'); }
 
-// Load arsip dari localStorage saat init
-function loadArsipData() {
-    try {
-        const stored = localStorage.getItem('arsipData');
-        if (stored) {
-            arsipData = JSON.parse(stored);
-        }
-    } catch (e) {
-        console.error('Gagal load arsip:', e);
-    }
-}
-
-// Simpan arsip ke localStorage
-function saveArsipData() {
-    try {
-        localStorage.setItem('arsipData', JSON.stringify(arsipData));
-    } catch (e) {
-        console.error('Gagal simpan arsip:', e);
-        showToast('Gagal menyimpan arsip', 'error');
-    }
-}
-
-// Fungsi arsip yang BARU - GANTI yang lama
-function arsipkanHalaman(name) {
-    if (!isEndOfMonth() || hasArchivedThisMonth) {
-        showToast('Arsip hanya dapat dilakukan di akhir bulan dan belum dilakukan bulan ini', 'error');
-        return;
-    }
-    
-    const confirmMsg = `Apakah Anda yakin ingin mengarsipkan "${name}"?\n\nData akan disimpan dengan periode: ${getPeriodeString()}`;
-    
-    if (!confirm(confirmMsg)) {
-        return;
-    }
-    
-    const today = new Date();
-    const arsipItem = {
-        periode: {
-            bulan: currentPeriod.bulan,
-            tahun: currentPeriod.tahun,
-            periodeString: getPeriodeString()
-        },
-        tanggalArsip: today.toISOString(),
-        data: [...transaksiList], // Copy semua data transaksi
-        jurnalEntries: transaksiList.filter(t => t.tipe_transaksi === 'Jurnal'),
-        transaksiKasir: transaksiList.filter(t => !t.is_jurnal_otomatis),
-        menuInfo: {...window.menuInfoMap}
-    };
-    
-    // Simpan ke arsip
-    if (!arsipData[name]) {
-        arsipData[name] = [];
-    }
-    
-    arsipData[name].push(arsipItem);
-    saveArsipData();
-    
-    // Update status arsip
-    hasArchivedThisMonth = true;
-    lastArchiveDate = today.toISOString();
-    
-    // Simpan status arsip
-    try {
-        localStorage.setItem('lastArchiveDate', lastArchiveDate);
-        localStorage.setItem('hasArchivedThisMonth', 'true');
-    } catch (e) {
-        console.error('Gagal simpan status arsip:', e);
-    }
-    
-    updateButtonStates();
-    
-    showToast(`✅ ${name} berhasil diarsipkan untuk periode ${getPeriodeString()}!`, 'success');
-}
-
-// Fungsi reset yang BARU - GANTI yang lama
-async function resetData() {
-    if (!hasArchivedThisMonth) {
-        showToast('Reset hanya dapat dilakukan setelah arsip', 'error');
-        return;
-    }
-    
-    const confirmMsg = `⚠️ PERINGATAN ⚠️\n\nAnda akan mereset SEMUA data transaksi!\n\nData sudah diarsipkan untuk periode: ${getPeriodeString()}\n\nSetelah reset:\n- Semua transaksi akan dihapus\n- Periode akan berganti ke bulan berikutnya\n- Anda dapat melihat data lama di menu Arsip\n\nLanjutkan reset?`;
-    
-    if (!confirm(confirmMsg)) {
-        return;
-    }
-    
-    // Konfirmasi kedua
-    const finalConfirm = prompt('Ketik "RESET" (huruf besar) untuk mengkonfirmasi reset data:');
-    
-    if (finalConfirm !== 'RESET') {
-        showToast('Reset dibatalkan', 'error');
-        return;
-    }
-    
-    try {
-        // Kosongkan transaksi
-        transaksiList = [];
-        window.menuInfoMap = {};
-        
-        // Update periode ke bulan berikutnya
-        currentPeriod.bulan++;
-        if (currentPeriod.bulan > 12) {
-            currentPeriod.bulan = 1;
-            currentPeriod.tahun++;
-        }
-        
-        // Reset status arsip
-        hasArchivedThisMonth = false;
-        lastArchiveDate = null;
-        
-        // Simpan perubahan
-        localStorage.setItem('transaksiList', JSON.stringify(transaksiList));
-        localStorage.setItem('currentPeriod', JSON.stringify(currentPeriod));
-        localStorage.removeItem('lastArchiveDate');
-        localStorage.removeItem('hasArchivedThisMonth');
-        
-        // Update UI
-        dataHandler.onDataChanged(transaksiList);
-        updatePeriodeDisplay();
-        updateButtonStates();
-        
-        showToast(`✅ Data berhasil direset! Periode baru: ${getPeriodeString()}`, 'success');
-        
-        // Refresh semua dashboard
-        setTimeout(() => {
-            switchDashboard('dashboard-kasir');
-        }, 500);
-        
-    } catch (e) {
-        console.error('Error saat reset:', e);
-        showToast('Gagal mereset data: ' + e.message, 'error');
-    }
-}
-
-// Fungsi untuk melihat arsip
-function lihatArsip(name) {
-    const arsip = arsipData[name];
-    
-    if (!arsip || arsip.length === 0) {
-        alert(`Belum ada arsip untuk "${name}"`);
-        return;
-    }
-    
-    let message = `📁 ARSIP ${name.toUpperCase()}\n\n`;
-    message += `Total arsip: ${arsip.length}\n\n`;
-    
-    arsip.forEach((item, index) => {
-        message += `${index + 1}. ${item.periode.periodeString}\n`;
-        message += `   Diarsipkan: ${new Date(item.tanggalArsip).toLocaleString('id-ID')}\n`;
-        message += `   Total transaksi: ${item.data.length}\n\n`;
-    });
-    
-    alert(message);
-}
-
-// Fungsi untuk ekspor arsip ke JSON
-function eksporArsip() {
-    try {
-        const dataStr = JSON.stringify(arsipData, null, 2);
-        const blob = new Blob([dataStr], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-        
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `Arsip_KingsSteak_${new Date().toISOString().split('T')[0]}.json`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-        
-        showToast('✅ Arsip berhasil diekspor!', 'success');
-    } catch (e) {
-        console.error('Gagal ekspor arsip:', e);
-        showToast('Gagal mengekspor arsip', 'error');
-    }
-}
-
-async function init() { 
-    updateDateTime(); 
-    setInterval(updateDateTime, 1000); 
-    updatePeriodeDisplay(); 
-    
-    // Load periode tersimpan
-    try {
-        const savedPeriod = localStorage.getItem('currentPeriod');
-        if (savedPeriod) {
-            currentPeriod = JSON.parse(savedPeriod);
-            updatePeriodeDisplay();
-        }
-    } catch (e) {
-        console.warn('Gagal load periode:', e);
-    }
-    
-    // Load status arsip
-    try {
-        lastArchiveDate = localStorage.getItem('lastArchiveDate');
-        hasArchivedThisMonth = localStorage.getItem('hasArchivedThisMonth') === 'true';
-    } catch (e) {
-        console.warn('Gagal load status arsip:', e);
-    }
-    
-    checkArchiveStatus(); 
-    setInterval(checkArchiveStatus, 3600000);
-    
-    // Load arsip data
-    loadArsipData();
-    
-    try { 
-        const raw = localStorage.getItem('transaksiList'); 
-        if (raw) { 
-            transaksiList = JSON.parse(raw); 
-            dataHandler.onDataChanged(transaksiList); 
-        }
-    } catch(e) {
-        console.warn('Gagal load local transaksi', e);
-    }
-    
-    try { 
-        await flushSync(); 
-    } catch(e) {}
+async function init(){ updateDateTime(); setInterval(updateDateTime,1000); updatePeriodeDisplay(); checkArchiveStatus(); setInterval(checkArchiveStatus,3600000);
+    try{ const raw = localStorage.getItem('transaksiList'); if (raw){ transaksiList = JSON.parse(raw); dataHandler.onDataChanged(transaksiList); }}catch(e){console.warn('Gagal load local transaksi',e)}
+    try{ await flushSync(); }catch(e){}
 }
 
 /**
